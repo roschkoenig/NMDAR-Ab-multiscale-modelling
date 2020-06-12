@@ -1,3 +1,4 @@
+function ncl_dcm_invert_all(F)
 % Load DCM files 
 %--------------------------------------------------------------------------
 fs      = filesep;
@@ -13,16 +14,20 @@ end
 %--------------------------------------------------------------------------
 clear ICM
 for c = 1:length(conds)
-    if ~strcmp(conds{cond_no}, 'Control baseline')
+    if ~strcmp(conds{c}, 'Control baseline')
         TMP = load([F.outp fs 'DCM' fs 'DCM_Control baseline']);
-        
+        DCM(c).xY.scale = TMP.DCM.xY.scale;
     end
-    ICM(c) = spm_dcm_csd(DCM(c)); 
+    DCM(c).M.pE.L = 1000; 
+    ICM(c) = ncl_spm_dcm_csd(DCM(c)); 
 end
 
-%% 
+% Plot initial model fits
+%--------------------------------------------------------------------------
+clf
 cols = ['k', 'b', 'r']; 
 for c = 1:length(conds)
     plot(log(abs(ICM(c).Hc{1})), 'color', cols(c)), hold on
-    plot(log(abs(DCM(c).xY.y{1})), ':', 'color', cols(c)); 
+    plot(log(abs(ICM(c).xY.y{1})), ':', 'color', cols(c));  hold on
 end
+

@@ -86,7 +86,7 @@ DCM  = spm_dcm_erp_dipfit(DCM, 1);
 %==========================================================================
 % Load standard neural priors
 %--------------------------------------------------------------------------
-[pE,pC]  = spm_dcm_neural_priors(DCM.A,DCM.B,DCM.C,DCM.options.model);  
+[pE,pC]  = ncl_spm_dcm_neural_priors(DCM.A,DCM.B,DCM.C,DCM.options.model);  
 [pE,pC]  = spm_L_priors(DCM.M.dipfit,pE,pC);
 [pE,pC]  = spm_ssr_priors(pE,pC);
 
@@ -98,7 +98,7 @@ DCM.M.pC   = pC;
 if ~strcmp(conds{cond_no}, 'Control baseline')
 for b = 1:max(length(DCM.B),1) 
     TMP = load([F.outp fs 'DCM' fs 'DCM_Control baseline.mat']); 
-    DCM.xY.mar{b}.noise_cov = TMP.DCM.xY.mar{b}.noise_cov; 
+%     DCM.xY.mar{b}.noise_cov = TMP.DCM.xY.mar{b}.noise_cov; 
 end 
 end
 

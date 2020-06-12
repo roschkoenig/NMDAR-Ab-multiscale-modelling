@@ -85,7 +85,7 @@ if isempty(DCM.xU.X),    DCM.C    = sparse(Ns,0); end
  
 % prior moments on parameters
 %--------------------------------------------------------------------------
-[pE,pC]  = spm_dcm_neural_priors(DCM.A,DCM.B,DCM.C,model);
+[pE,pC]  = ncl_spm_dcm_neural_priors(DCM.A,DCM.B,DCM.C,model);
   
 % check to see if neuronal priors have already been specified
 %--------------------------------------------------------------------------
@@ -110,6 +110,7 @@ try
         pE = DCM.M.pE;
         pC = DCM.M.pC;
         fprintf('Using existing priors\n')
+        
     end
 end
  

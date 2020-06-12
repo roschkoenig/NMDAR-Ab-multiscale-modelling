@@ -5,6 +5,6 @@ C   = ncl_preproc_epspseg(C);           % Segments out EPSCs
 C   = ncl_preproc_featextract(C);       % Calculates some statistics based on EPSCs
 F   = ncl_preproc_segment(C,F);         % Segment out relative data segments
 
-% DCM part
+%% DCM part
 ncl_dcm_specify(F); 
-
+% ncl_dcm_invert_all(C, F);             % Inverts 
