@@ -1,5 +1,5 @@
 function [f,J,Q] = ncl_spm_fx_cmc(x,u,P,M)
-disp('Using a custom version of the Canonical Microcircuit'); 
+% disp('Using a custom version of the Canonical Microcircuit'); 
 
 % state equations for a neural mass model (canonical microcircuit)
 % FORMAT [f,J,D] = spm_fx_cmc(x,u,P,M)

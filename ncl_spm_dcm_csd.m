@@ -116,11 +116,11 @@ end
  
 % initial states and equations of motion
 %--------------------------------------------------------------------------
-[x,f]    = spm_dcm_x_neural(pE,model);
+[x,f]    = ncl_spm_dcm_x_neural(pE,model);
  
 % create DCM
 %--------------------------------------------------------------------------
-DCM.M.IS = 'spm_csd_mtf';                                                  % <- call custom feature selection
+DCM.M.IS = 'ncl_spm_csd_mtf';                                                  % <- call custom feature selection
 DCM.M.FS = 'ncl_spm_fs_csd';
 DCM.M.g  = 'spm_gx_erp';
 DCM.M.f  = f;
@@ -210,7 +210,7 @@ warning('on', 'SPM:negativeVariance');
  
 % predictions (csd) and error (sensor space)
 %--------------------------------------------------------------------------
-Hc  = spm_csd_mtf(Qp,DCM.M,DCM.xU);                      % prediction
+Hc  = ncl_spm_csd_mtf(Qp,DCM.M,DCM.xU);                      % prediction
 Ec  = spm_unvec(spm_vec(DCM.xY.y) - spm_vec(Hc),Hc);     % prediction error
  
  
@@ -226,7 +226,7 @@ qp.L        = ones(1,Ns);             % set virtual electrode gain to unity
 qp.b        = qp.b - 32;              % and suppress non-specific and
 qp.c        = qp.c - 32;              % specific channel noise
 
-[Hs Hz dtf] = spm_csd_mtf(qp,M,DCM.xU);
+[Hs Hz dtf] = ncl_spm_csd_mtf(qp,M,DCM.xU);
 [ccf pst]   = spm_csd2ccf(Hs,DCM.M.Hz);
 [coh fsd]   = spm_csd2coh(Hs,DCM.M.Hz);
 DCM.dtf     = dtf;
