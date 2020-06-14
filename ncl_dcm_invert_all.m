@@ -1,4 +1,5 @@
 function ncl_dcm_invert_all(F)
+
 % Load DCM files 
 %--------------------------------------------------------------------------
 fs      = filesep;
@@ -6,8 +7,9 @@ D       = spm_eeg_load(F.spm_file);
 conds   = condlist(D);  
 clear DCM
 for c = 1:length(conds)
-    T = load([F.outp fs 'DCM' fs 'DCM_' conds{c}]);
-    DCM(c) = T.DCM; 
+    T           = load([F.outp fs 'DCM' fs 'DCM_' conds{c}]);
+    DCM(c)      = T.DCM; 
+    DCM(c).name = [F.outp fs 'DCM' fs 'ICM_' conds{c}];
 end
 
 % Invert individual DCMs without altered priors
@@ -15,7 +17,7 @@ end
 clear ICM
 for c = 1:length(conds)
     if ~strcmp(conds{c}, 'Control baseline')
-        TMP = load([F.outp fs 'DCM' fs 'DCM_Control baseline']);
+        TMP             = load([F.outp fs 'DCM' fs 'DCM_Control baseline']);
         DCM(c).xY.scale = TMP.DCM.xY.scale;
     end
     DCM(c).M.pE.L = 1000; 

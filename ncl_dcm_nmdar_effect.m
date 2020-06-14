@@ -3,15 +3,15 @@ fs      = filesep;
 
 % Load control
 %--------------------------------------------------------------------------
-control = dir([F.outp fs 'DCM' fs 'DCM_Control*']);
+control = dir([F.outp fs 'DCM' fs 'ICM_Control*']);
 CNT     = load([control.folder fs control.name]);
-CNT     = CNT.DCM; 
+CNT     = rmfield(CNT.DCM, 'name'); 
 
 % Load NMDAR-baseline
 %--------------------------------------------------------------------------
-nmdar   = dir([F.outp fs 'DCM' fs 'DCM_NMDAR-Ab positive s*']); 
+nmdar   = dir([F.outp fs 'DCM' fs 'DCM_NMDAR-Ab positive b*']); 
 NMD     = load([nmdar.folder fs nmdar.name]); 
-NMD     = NMD.DCM; 
+NMD     = rmfield(NMD.DCM, 'name'); 
 
 % Switch off variation in observation parameters
 %--------------------------------------------------------------------------
@@ -106,8 +106,7 @@ end
 % Pack up and reinvert
 %--------------------------------------------------------------------------
 disp(['Inverting model ' num2str(m) ' of ' num2str(length(mspace))]); 
-P{m}            = rmfield(NMD, 'name'); 
-P{m}            = rmfield(P{m}, 'F'); 
+P{m}            = NMD; 
 P{m}.M.pE       = this_pE; 
 P{m}.nmda_mod   = mspace(m);
 P{m}            = ncl_spm_dcm_csd(P{m});

@@ -109,7 +109,7 @@ DCM.options.DATA = 0;
 
 % Save extracted data features and DCM structure
 %--------------------------------------------------------------------------
-DCM.name = [F.outp fs 'DCM' fs 'dcm_' conds{cond_no}]; 
+DCM.name = [F.outp fs 'DCM' fs 'DCM_' conds{cond_no}]; 
 save(DCM.name, 'DCM'); 
 
 end

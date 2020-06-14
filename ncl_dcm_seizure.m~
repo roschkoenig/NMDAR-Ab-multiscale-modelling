@@ -1,17 +1,37 @@
 fs  = filesep;
-CNT = load([F.outp fs 'DCM' fs 'DCM_Control baseline']);
+
+% Load control DCMs (initial inversion)
+%--------------------------------------------------------------------------
+CNT = load([F.outp fs 'DCM' fs 'ICM_Control baseline']);
+CNT = rmfield(CNT.DCM, 'name');
+
+% Load NMDA-baseline DCMs (from Bayesian model comparison)
+%-------------------------------------------------------------------------
 NMD = load([F.outp fs 'DCM' fs 'Model_comparison_NMDAR.mat']); 
+nmds = NMD.P; 
+NMD = NMD.AVG; 
+
+% Load (uninverted) seizure DCMs 
+%--------------------------------------------------------------------------
 SZR = load([F.outp fs 'DCM' fs 'DCM_NMDAR-Ab positive seizure.mat']); 
+SZR = rmfield(SZR.DCM, 'name');
 
 %% Reinvert seizure effect using NMD average as priors
-%--------------------------------------------------------------------------
-szr = SZR.DCM; 
-szr
-NMD.AVG
+%==========================================================================
+SZR.M.pE    = NMD.Ep; 
+SZR         = ncl_spm_dcm_csd(SZR); 
 
-
-% Estimate main effect of seizure using PEB
+%% Estimate main effect of seizure using PEB
 %--------------------------------------------------------------------------
+clear fe
+for p = 1:length(nmds), fe(p) = nmds{p}.F; end
+[val winner] = max(fe);
+
+PCM{1,1} = nmds{winner}; 
+PCM{2,1} = SZR; 
+M.X(:,1) = [1, 1];      % group mean
+M.X(:,2) = [0, 1];      % main effect of seizure 
+
 
 % Apply the seizure effect to control setup - stability analysis 
 %--------------------------------------------------------------------------
