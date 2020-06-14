@@ -1,3 +1,4 @@
+function ncl_dcm_nmdar_effect(C,F) 
 fs      = filesep;
 
 % Load control
@@ -51,9 +52,11 @@ mspace(19).pops = {'superficial'};         mspace(19).pars = {'amplitude'};
 mspace(20).pops = {'superficial'};         mspace(20).pars = {'time constant'};                                  
 mspace(21).pops = {'superficial'};         mspace(21).pars = {'variance'};                                      
 mspace(22).pops = {};                      mspace(22).pars = {};                   
- 
+
 clear P
 for m = 1:length(mspace)
+this_pE = pE; 
+
 % Excitatory connectivity 
 %--------------------------------------------------------------------------
 % Custom Mapping 
@@ -68,12 +71,13 @@ for m = 1:length(mspace)
 % G(:,8)  ii -> ii (-ve self)  4    Gain
 % G(:,9)  sp -> sp (-ve self)  4    Gain
 % G(:,10) dp -> dp (-ve self)  1    Gain
-if ~isempty(strcmp(mspace(m).pars, 'amplitude'))
+
+if ~isempty(find(strcmp(mspace(m).pars, 'amplitude')))
     pid       = [];
     amp_ratio = log(C(ni).amplitude / C(ci).amplitude);
-    if ~isempty(strcmp(mspace(m).pops, 'deep')),        pid = [pid(:); 1,2];  end
-    if ~isempty(strcmp(mspace(m).pops, 'superficial')), pid = [pid(:); 3];    end
-    pE.G(1:3) = pE.G(pid) + amp_ratio; 
+    if ~isempty(find(strcmp(mspace(m).pops, 'deep'))),        pid = [pid(:); 1,2];  end
+    if ~isempty(find(strcmp(mspace(m).pops, 'superficial'))), pid = [pid(:); 3];    end
+    this_pE.G(pid) = this_pE.G(pid) + amp_ratio; 
 end
 
 % Time constants
@@ -83,27 +87,31 @@ end
 % T(2)  sp  receives excitation
 % T(3)  ii  receives excitation
 % T(4)  dp
-if ~isempty(strcmp(mspace(m).pars, 'time constant'))
+
+if ~isempty(find(strcmp(mspace(m).pars, 'time constant')))
     pid         = []; 
     tim_ratio   = log(C(ni).halflife / C(ci).halflife);
-    if ~isempty(strcmp(mspace(m).pops, 'deep')),        pid = [pid(:); 3];  end
-    if ~isempty(strcmp(mspace(m).pops, 'superficial')), pid = [pid(:); 2];    end
-    pE.T([2,3]) = pE.T([2,3]) + tim_ratio; 
+    if ~isempty(find(strcmp(mspace(m).pops, 'deep'))),        pid = [pid(:); 3];  end
+    if ~isempty(find(strcmp(mspace(m).pops, 'superficial'))), pid = [pid(:); 2];    end
+    this_pE.T(pid) = this_pE.T(pid) + tim_ratio; 
 end
 
 % Set up model space to explain NMDAR-Ab effect
 %--------------------------------------------------------------------------
-if ~isempty(strcmp(mspace(m).pars, 'variance'))
+if ~isempty(find(strcmp(mspace(m).pars, 'variance')))
     sig_ratio   = log(C(ni).sigma / C(ci).sigma); 
-    pE.S        = pE.S + sig_ratio; 
+    this_pE.S   = this_pE.S + sig_ratio; 
 end
 
 % Pack up and reinvert
 %--------------------------------------------------------------------------
 disp(['Inverting model ' num2str(m) ' of ' num2str(length(mspace))]); 
 P{m}            = rmfield(NMD, 'name'); 
-P{m}.M.pE       = pE; 
+P{m}            = rmfield(P{m}, 'F'); 
+P{m}.M.pE       = this_pE; 
 P{m}.nmda_mod   = mspace(m);
-P{m}            = ncl_spm_dcm_csd(P{m}); 
+P{m}            = ncl_spm_dcm_csd(P{m});
 
 end
+
+save([F.outp fs 'DCM' fs 'Model_comparison_NMDAR.mat'], 'P', 'mspace')

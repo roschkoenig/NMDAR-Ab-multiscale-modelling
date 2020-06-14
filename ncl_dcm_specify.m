@@ -98,7 +98,7 @@ DCM.M.pC   = pC;
 if ~strcmp(conds{cond_no}, 'Control baseline')
 for b = 1:max(length(DCM.B),1) 
     TMP = load([F.outp fs 'DCM' fs 'DCM_Control baseline.mat']); 
-%     DCM.xY.mar{b}.noise_cov = TMP.DCM.xY.mar{b}.noise_cov; 
+    DCM.xY.mar{b}.noise_cov = TMP.DCM.xY.mar{b}.noise_cov; 
 end 
 end
 
@@ -109,7 +109,7 @@ DCM.options.DATA = 0;
 
 % Save extracted data features and DCM structure
 %--------------------------------------------------------------------------
-DCM.name = [F.outp fs 'DCM' fs 'DCM_' conds{cond_no}]; 
+DCM.name = [F.outp fs 'DCM' fs 'dcm_' conds{cond_no}]; 
 save(DCM.name, 'DCM'); 
 
 end
