@@ -1,4 +1,4 @@
-function [y,w,s,g] = spm_csd_mtf(P,M,U)
+function [y,w,s,g] = ncl_spm_csd_mtf(P,M,U)
 % Spectral response of a NMM (transfer function x noise spectrum)
 % FORMAT [y,w,s,g] = spm_csd_mtf(P,M,U)
 % FORMAT [y,w,s,g] = spm_csd_mtf(P,M)
