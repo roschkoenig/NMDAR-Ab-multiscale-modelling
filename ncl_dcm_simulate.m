@@ -27,7 +27,7 @@ EG(1).vec(EG.id)   = nmd_pars(EG.id) - cnt_pars(EG.id);
 
 % Epiletogenicity vector (2) full
 %--------------------------------------------------------------------------
-EG(2).vec          = nmd_pars - cnt_pars;     
+EG(2).vec          =  nmd_pars - cnt_pars;
 
 % Ictogenicity vector
 %--------------------------------------------------------------------------
@@ -36,7 +36,7 @@ for i = 1:length(I.Sfx.Pnames)
 end
 IG(1).vec          = zeros(size(cnt_pars)); 
 IG(1).vec(IG.id)   = I.Sfx.vec; 
-IG(2).vec          = szr_pars - cnt_pars; 
+IG(2).vec          = szr_pars - (cnt_pars + EG(2).vec); 
 
 
 % Simulation
@@ -46,7 +46,7 @@ IG(2).vec          = szr_pars - cnt_pars;
 e_effect = 2;   % 1 - 'reduced' or 2 - 'full'
 i_effect = 2;   % 1 - 'reduced' or 2 - 'full'
 
-steps  = 50; 
+steps  = 15; 
 escale = linspace(0, 1, steps);   
 iscale = linspace(0, 1, steps); 
 frqhi  = intersect(find(CNT.M.Hz >= 0), find(CNT.M.Hz < 8));
@@ -58,6 +58,7 @@ clear sims ratio
 % Run simulation
 %--------------------------------------------------------------------------
 for e = 1:steps
+    disp(['Simulating step ' num2str(e) ' of ' num2str(steps)]); 
 for i = 1:steps 
     simpars         = spm_unvec(cnt_pars + escale(e) * EG(e_effect).vec + iscale(i) * IG(i_effect).vec, CNT.Ep); 
     y               = ncl_spm_csd_mtf(simpars, CNT.M, CNT.xU); 
@@ -85,6 +86,7 @@ ratio = hi ./ lo;
 
 % Calculate difference function
 %--------------------------------------------------------------------------
+clear diff
 for r = 2:(size(sims,1)-1)
 for c = 2:(size(sims,2)-1)
     % Average of all neighbours
@@ -102,21 +104,87 @@ for c = 2:(size(sims,2)-1)
 end
 end
 
+fn = 0; 
+close all
+figure(fn+1),   fn = fn+1;  
+    set(gcf, 'color', 'w', 'position', [200,800,400,400])
+    cols = cbrewer('qual', 'Dark2', 3); 
+    plot(log(abs(CNT.xY.y{1})), '--', 'color', cols(3,:), 'linewidth', 1.5), hold on
+    plot(log(abs(CNT.Hc{1})), 'color', cols(3,:), 'linewidth', 1.5),
+    plot(log(abs(NMD.xY.y{1})), '--', 'color', cols(3,:), 'linewidth', 1.5), hold on
+    plot(log(abs(NMD.xY.y{1})), 'color', cols(1,:), 'linewidth', 1.5), 
+    plot(log(abs(SZR.xY.y{1})), '--', 'color', cols(3,:), 'linewidth', 1.5), hold on
+    plot(log(abs(SZR.xY.y{1})), 'color', cols(2,:), 'linewidth', 1.5); 
 
-subplot(2,2,1), imagesc(log(ratio)); axis square
-subplot(2,2,2), imagesc(diff);  axis square
+figure(fn+1),   fn = fn+1;  
+    set(gcf, 'color', 'w', 'position', [600,800,400,400])
+    colormap(flip(cbrewer('div', 'Spectral', 100))); 
+    imagesc((ratio)); axis square
+    title('Spectral features across simualted parameter space'); 
+    set(gca, 'Ytick', [1,size(ratio,1)], 'YTickLabel', {'control', 'NMDAR-Ab +ive'});
+    set(gca, 'Xtick', [1,size(ratio,2)], 'XTickLabel', {'interictal', 'ictal'}); 
+    ytickangle(90); 
+    cb = colorbar();
+    ylabel(cb, 'High/Low frequency amplitude ratio');
+    
+figure(fn+1), fn = fn+1;  
+    set(gcf, 'color', 'w', 'position', [1000,800,400,400])
+    cm  = cbrewer('qual', 'Set2', 3);
+    colormap(cm([3 1 2],:)); 
+    imagesc(paramspace);    axis square
+    title('State classification'); 
+    set(gca, 'Ytick', [1,size(ratio,1)], 'YTickLabel', {'control', 'NMDAR-Ab +ive'});
+    set(gca, 'Xtick', [1,size(ratio,2)], 'XTickLabel', {'interictal', 'ictal'}); 
+    ytickangle(90)
+    cb = colorbar;
+    set(cb, 'ytick', [1 2 3], 'yticklabel', {'CNT', 'NMD', 'SZR'}); 
+    
+figure(fn+1), fn = fn+1;  
+    set(gcf, 'color', 'w', 'position', [1000,300,400,400])
+    imagesc(diff);  axis square
+    colormap(flip(cbrewer('div', 'RdGy', 100))); 
+    cb = colorbar;
+    ylabel(cb, 'Sensitivity to parameter change'); 
+    set(gca, 'Ytick', [1,size(ratio,1)-2], 'YTickLabel', {'control', 'NMDAR-Ab +ive'});
+    set(gca, 'Xtick', [1,size(ratio,2)-2], 'XTickLabel', {'interictal', 'ictal'});
+    ytickangle(90); 
+    
+figure(fn+1), fn = fn+1;  
+    set(gcf, 'color', 'w', 'position', [200,300,800,400]); 
+    Hz  = CNT.M.Hz; 
+    subplot(1,2,1)
+        cols = cbrewer('qual', 'Dark2', 3); 
+        gris = (cbrewer('seq', 'YlOrRd', size(sims,2))); 
+        cnt  = log(abs(CNT.xY.y{1})); 
+        for s =1:5:size(sims,2), plot(Hz,log(abs(sims{1,s}))-cnt, 'color', gris(s,:)); hold on; end
+        plot(Hz,log(abs(CNT.xY.y{1}))-cnt, '--', 'color', cols(3,:), 'linewidth', 2); hold on
+        plot(Hz,log(abs(SZR.xY.y{1}))-cnt, '--','color', cols(2,:), 'linewidth', 2); 
+        title('Sensitivity of normal circuit to ictogenic parameter changes'); 
+        ylim([-1.5 2.5]); 
+        
+    subplot(1,2,2)
+        cols = cbrewer('qual', 'Dark2', 3); 
+        gris = (cbrewer('seq', 'YlOrRd', size(sims,2))); 
+        nmd  = log(abs(NMD.xY.y{1})); 
+        for s =1:3:size(sims,2), plot(Hz,log(abs(sims{end,s}))-nmd, 'color', gris(s,:)); hold on; end
+        plot(Hz,log(abs(NMD.xY.y{1}))-nmd, '--', 'color', cols(1,:), 'linewidth', 2); hold on
+        plot(Hz,log(abs(SZR.xY.y{1}))-nmd, '--', 'color', cols(2,:), 'linewidth', 2); 
+        title('Sensitivity of NMDAR-Ab circuit to ictogenic parameter changes'); 
+        ylim([-1.5, 2.5])
+        
+        
+% subplot(2,2,1), imagesc(log(ratio)); axis square
+% subplot(2,2,2), imagesc(diff);  axis square
 
-subplot(2,2,3), imagesc(paramspace);    axis square
-subplot(2,2,4), 
-    cols = cbrewer('seq', 'YlOrRd', size(diff,1));
-    for d = 1:size(diff,1)  % epileptogenicity
-        plot(exp(diff(d,:)), 'color', cols(d,:));  hold on
-        axis square
-        pause
-    end
+% subplot(2,2,3), imagesc(paramspace);    axis square
+% % subplot(2,2,4), 
+%     cols = cbrewer('seq', 'YlOrRd', size(diff,1));
+%     for d = 1:size(diff,1)  % epileptogenicity
+%         plot(exp(diff(d,:)), 'color', cols(d,:));  hold on
+%     end
 
 
-%% Local functions
+% Local functions
 %-=========================================================================
 function cl = classification(y, dcms)
     for d = 1:length(dcms)

@@ -7,6 +7,7 @@ function F = ncl_housekeeping()
     F.addpaths = {
         '/Users/roschkoenig/Dropbox/Research/0002 Tools/Matlab/spm',
         '/Users/roschkoenig/Dropbox/Research/0002 Tools/Matlab/abfload',
+        '/Users/roschkoenig/Dropbox/Research/0002 Tools/Matlab/cbrewer',
         F.code
     };
 
