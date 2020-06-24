@@ -10,7 +10,7 @@ SZR = I.AllCM{3};
 % plot(log(abs(y{1}))); hold on
 % plot(log(abs(CNT.xY.y{1})))
 
-%% Microscale differences
+% Microscale differences
 %--------------------------------------------------------------------------
 clear EG IG
 cnt_pars        = spm_vec(CNT.Ep); 
@@ -27,7 +27,7 @@ EG(1).vec(EG.id)   = nmd_pars(EG.id) - cnt_pars(EG.id);
 
 % Epiletogenicity vector (2) full
 %--------------------------------------------------------------------------
-EG(2).vec          =  nmd_pars - cnt_pars;
+EG(2).vec          =  nmd_pars - cnt_pars; %- EG(1).vec;
 
 % Ictogenicity vector
 %--------------------------------------------------------------------------
@@ -36,7 +36,7 @@ for i = 1:length(I.Sfx.Pnames)
 end
 IG(1).vec          = zeros(size(cnt_pars)); 
 IG(1).vec(IG.id)   = I.Sfx.vec; 
-IG(2).vec          = szr_pars - (cnt_pars + EG(2).vec); 
+IG(2).vec          = szr_pars - nmd_pars; 
 
 
 % Simulation
@@ -46,17 +46,13 @@ IG(2).vec          = szr_pars - (cnt_pars + EG(2).vec);
 e_effect = 2;   % 1 - 'reduced' or 2 - 'full'
 i_effect = 2;   % 1 - 'reduced' or 2 - 'full'
 
-steps  = 15; 
+steps  = 20; 
 escale = linspace(0, 1, steps);   
 iscale = linspace(0, 1, steps); 
-frqhi  = intersect(find(CNT.M.Hz >= 0), find(CNT.M.Hz < 8));
-frqlo  = intersect(find(CNT.M.Hz >= 8), find(CNT.M.Hz < 60)); 
-
-clear sims ratio
-
 
 % Run simulation
 %--------------------------------------------------------------------------
+clear sims ratio
 for e = 1:steps
     disp(['Simulating step ' num2str(e) ' of ' num2str(steps)]); 
 for i = 1:steps 
@@ -70,6 +66,8 @@ end
 %--------------------------------------------------------------------------
 % Calculate spectral patterns
 %--------------------------------------------------------------------------
+frqhi        = intersect(find(CNT.M.Hz >= 0), find(CNT.M.Hz < 8));
+frqlo        = intersect(find(CNT.M.Hz >= 20), find(CNT.M.Hz < 60)); 
 paramspace   = zeros(size(sims)); 
 hi           = zeros(size(sims)); 
 lo           = zeros(size(sims)); 
@@ -91,9 +89,6 @@ for r = 2:(size(sims,1)-1)
 for c = 2:(size(sims,2)-1)
     % Average of all neighbours
     %----------------------------------------------------------------------
-%     neighbours = {sims{r-1,c-1}, sims{r-1,c}, sims{r-1,c+1}, ...
-%                   sims{r,c-1}, sims{r,c+1}, ...
-%                   sims{r+1,c-1}, sims{r+1,c}, sims{r+1,c+1}};
     neighbours = {sims{r,c-1}, sims{r,c+1}};
     nsum = zeros(size(neighbours{1}));
     for n = 1:length(neighbours)
@@ -160,7 +155,7 @@ figure(fn+1), fn = fn+1;
         plot(Hz,log(abs(CNT.xY.y{1}))-cnt, '--', 'color', cols(3,:), 'linewidth', 2); hold on
         plot(Hz,log(abs(SZR.xY.y{1}))-cnt, '--','color', cols(2,:), 'linewidth', 2); 
         title('Sensitivity of normal circuit to ictogenic parameter changes'); 
-        ylim([-1.5 2.5]); 
+        ylim([-2.5 2.5]); 
         
     subplot(1,2,2)
         cols = cbrewer('qual', 'Dark2', 3); 
@@ -170,18 +165,23 @@ figure(fn+1), fn = fn+1;
         plot(Hz,log(abs(NMD.xY.y{1}))-nmd, '--', 'color', cols(1,:), 'linewidth', 2); hold on
         plot(Hz,log(abs(SZR.xY.y{1}))-nmd, '--', 'color', cols(2,:), 'linewidth', 2); 
         title('Sensitivity of NMDAR-Ab circuit to ictogenic parameter changes'); 
-        ylim([-1.5, 2.5])
+        ylim([-2.5, 2.5])
         
-        
-% subplot(2,2,1), imagesc(log(ratio)); axis square
-% subplot(2,2,2), imagesc(diff);  axis square
+figure(fn+1), fn = fn+1;  
+    set(gcf, 'color', 'w', 'position', [1400,300,400,800]); 
+    plthis = [ceil(0.1*size(sims,1)), ceil(0.5*size(sims,1)), ceil(0.9*size(sims,1))]; 
 
-% subplot(2,2,3), imagesc(paramspace);    axis square
-% % subplot(2,2,4), 
-%     cols = cbrewer('seq', 'YlOrRd', size(diff,1));
-%     for d = 1:size(diff,1)  % epileptogenicity
-%         plot(exp(diff(d,:)), 'color', cols(d,:));  hold on
-%     end
+    for p = 1:3
+    plid = plthis(p);
+    separat = 0; 
+    subplot(3,1,p)
+    for s = 1:size(sims,2)
+        colid = [3 1 2];
+        plot(log(abs(sims{plid,s})) - log(abs(sims{1,1})) +s*separat, 'color', cols(colid(paramspace(plid,s)),:))
+        ylim([-2 2.5]); 
+        hold on
+    end
+    end
 
 
 % Local functions
