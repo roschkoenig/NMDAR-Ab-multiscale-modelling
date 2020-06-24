@@ -65,3 +65,4 @@ CNT.vec = CNT.vec(ids);
 NMD.vec = spm_vec(NMD.Ep); 
 NMD.vec = NMD.vec(ids); 
    
+bar(NMD.vec - CNT.vec)

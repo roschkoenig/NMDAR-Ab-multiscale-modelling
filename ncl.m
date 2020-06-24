@@ -9,6 +9,6 @@ F   = ncl_preproc_segment(C,F);         % Segment out relevant data segments
 % ncl_dcm_specify(F);                     % Specify DCMs and estimate CSDs 
 % ncl_dcm_invert_all(F);                  % Initial inversion of all DCMs 
 % ncl_dcm_nmdar_effect(C,F);              % Evaluate microscale explanation of NMDAR-Ab effect
-ncl_dcm_bmc(F); 
+% ncl_dcm_bmc(F); 
 ncl_dcm_seizure(F); 
 % ncl_dcm_simulate(F); 

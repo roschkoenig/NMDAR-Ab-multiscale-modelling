@@ -4,8 +4,8 @@ CNT = I.AllCM{1};
 NMD = I.AllCM{2}; 
 SZR = I.AllCM{3}; 
 
-% % Simulate baseline (sanity check
-% % --------------------------------------------------------------------------
+% Simulate baseline (sanity check
+%--------------------------------------------------------------------------
 % y = ncl_spm_csd_mtf(CNT.Ep, CNT.M, CNT.xU); 
 % plot(log(abs(y{1}))); hold on
 % plot(log(abs(CNT.xY.y{1})))

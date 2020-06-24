@@ -10,21 +10,18 @@ CNT = rmfield(CNT.DCM, 'name');
 % Load NMDA-baseline DCMs (from Bayesian model comparison)
 %-------------------------------------------------------------------------
 NMD = load([F.outp fs 'DCM' fs 'Model_comparison_NMDAR.mat']); 
-selection = 'full';   % 'average' or 'winner' or 'full'
+selection = 'average'   % 'average' or 'winner'
 
-if strcmp(selection, 'average')
+if selection == 'average'
     pC  = NMD.P{1}; 
     NMD = NMD.AVG; 
     NMD.M.pC = pC; 
     
-elseif strcmp(selection, 'winner')
+elseif selection == 'winner'
     clear FE
     for n = 1:length(NMD.P), FE(n) = NMD.P{n}.F; end
     [val winner] = max(FE); 
-    NMD = NMD.P{winner};
-    
-elseif strcmp(selection, 'full')
-    NMD = NMD.P{1}; 
+    NMD = NMD.P{winner}; 
 end
 
 % Load (uninverted) seizure DCMs 
@@ -38,7 +35,6 @@ SZR.M.pE    = NMD.Ep;
 SZR         = ncl_spm_dcm_csd(SZR); 
 
 if dopeb 
-    
     % Estimate main effect of seizure using PEB
     %==========================================================================
     PCM{1,1} = NMD; 
@@ -61,11 +57,8 @@ else
     Sfx.pid = [spm_fieldindices(CNT.Ep, 'G'); 
                spm_fieldindices(CNT.Ep, 'T'); 
                spm_fieldindices(CNT.Ep, 'S')]; 
-    nmdvec  = spm_vec(NMD.Ep); 
-    szrvec  = spm_vec(SZR.Ep); 
-    Sfx.vec = szrvec(Sfx.pid)-nmdvec(Sfx.pid);
-
-end
+    cntvec  = spm
+    Sfx.vec = 
 
 % Pack up for export
 %--------------------------------------------------------------------------
@@ -74,4 +67,4 @@ AllCM{1} = CNT;
 AllCM{2} = NMD; 
 AllCM{3} = SZR;
 
-save([F.outp fs 'DCM' fs 'Ictogenesis'], 'Sfx', 'AllCM')
+save([F.outp fs 'DCM' fs 'Ictogenesis'], 'Sfx', 'REB', 'AllCM')
