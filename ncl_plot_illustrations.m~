@@ -76,9 +76,3 @@ subplot(2,1,1), spm_plot_ci(NMD.vec - CNT.vec, NMD.cvec); ylim([-1.5 1])
 subplot(2,1,2), spm_plot_ci(SZR.vec - NMD.vec, SZR.cvec); ylim([-1.5 1])
 
 %% 
-mat = full([CNT.vec, NMD.vec, SZR.vec])';
-[coeff score] = pca(mat);
-cols = flip(cbrewer('div', 'Spectral', 10)); 
-for s = 1:size(score,1)
-    scatter(score(s,1), score(s,2)), hold on
-end

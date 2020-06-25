@@ -1,3 +1,4 @@
+function ncl_dcm_simulate(F)
 fs  = filesep;
 I   = load([F.outp fs 'DCM' fs 'Ictogenesis']); 
 CNT = I.AllCM{1};
@@ -182,7 +183,7 @@ figure(fn+1), fn = fn+1;
         hold on
     end
     end
-
+end
 
 % Local functions
 %-=========================================================================

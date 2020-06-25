@@ -8,7 +8,7 @@ function ncl_dcm_bmc(F)
     %--------------------------------------------------------------------------
     clear FE newmspace
     pi = 0; 
-    for p = [1 2 3 4 5 6 7 22] %1:length(P)
+    for p = 1:length(P)
         pi = pi + 1;
         FE(pi)       = P{p}.F;
         names{pi}    = ''; 

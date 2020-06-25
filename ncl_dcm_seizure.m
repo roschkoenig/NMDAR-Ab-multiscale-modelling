@@ -9,8 +9,9 @@ CNT = rmfield(CNT.DCM, 'name');
 
 % Load NMDA-baseline DCMs (from Bayesian model comparison)
 %-------------------------------------------------------------------------
-NMD = load([F.outp fs 'DCM' fs 'Model_comparison_NMDAR.mat']); 
-selection = 'full';   % 'average' or 'winner' or 'full'
+NMD = load([F.outp fs 'DCM' fs 'Model_comparison_NMDAR.mat']);
+AVG = NMD.AVG; 
+selection = 'winner';   % 'average' or 'winner' or 'full'
 
 if strcmp(selection, 'average')
     pC  = NMD.P{1}; 
@@ -34,7 +35,7 @@ SZR = rmfield(SZR.DCM, 'name');
 
 % Reinvert seizure effect using NMD average as priors
 %==========================================================================
-SZR.M.pE    = NMD.Ep; 
+SZR.M.pE    = AVG.Ep; 
 SZR         = ncl_spm_dcm_csd(SZR); 
 
 if dopeb 
